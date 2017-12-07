@@ -1,0 +1,27 @@
+{
+  "name": "chat-app",
+  "version": "0.0.1",
+  "description": "a chat app using socket.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "start": "nodemon ./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ggustilo/chat-app.git"
+  },
+  "author": "ggustilo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ggustilo/chat-app/issues"
+  },
+  "homepage": "https://github.com/ggustilo/chat-app#readme",
+  "dependencies": {
+    "express": "^4.16.2",
+    "socket.io": "^2.0.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.5"
+  }
+}
