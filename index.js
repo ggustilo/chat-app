@@ -1,21 +1,38 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var client = io.of('/client');
+var commandCenter = io.of('/commandCenter');
 
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
+app.get('/client', function(req, res){
+  res.sendFile(__dirname + '/client.html');
 });
 
-io.on('connection', function(socket){
-  console.log('a user connected');
+app.get('/commandCenter', function(req, res){
+    res.sendFile(__dirname + '/command.html');
+  });
+
+client.on('connection', function(socket){
+  console.log('a user connected to client');
   socket.on('disconnect', function(){
-    console.log('user disconnected');
+    console.log('user disconnected to client');
   });
   socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
+    commandCenter.emit('chat message', msg);
     console.log(msg);
   });
 });
+
+commandCenter.on('connection', function(socket){
+    console.log('a user connected to command');
+    socket.on('disconnect', function(){
+      console.log('user disconnected from command');
+    });
+    socket.on('chat message', function(msg){
+      client.emit('chat message', msg);
+      console.log(msg);
+    });
+  });
 
 http.listen(4050, function(){
   console.log('listening on *:4050');

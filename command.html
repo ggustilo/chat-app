@@ -11,22 +11,42 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
+      .speech-bubble {
+        position: relative;
+        background: #00aabb;
+        border-radius: .4em;
+      }
+      .speech-bubble:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border: 20px solid transparent;
+        border-top-color: #00aabb;
+        border-bottom: 0;
+        border-left: 0;
+        margin-left: -10px;
+        margin-bottom: -20px;
+      }
     </style>
   </head>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
   <script>
     $(function () {
-        var socket = io();
+        var commandCenter = io('/commandCenter');
         $('form').submit(function(){
-        socket.emit('chat message', $('#m').val());
-        $('#m').val('');
-        return false;
+            commandCenter.emit('chat message', $('#m').val());
+            $('#m').val('');
+            return false;
         });
-        socket.on('chat message', function(msg){
-        $('#messages').append($('<li>').text(msg));
+        commandCenter.on('chat message', function(msg){
+            $('#messages').append($('<li>').text(msg));
         });
     });
+    
   </script>
   <body>
     <ul id="messages"></ul>
