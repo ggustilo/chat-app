@@ -1,3 +1,3 @@
 TODO:
- - Nice bubbles for messages (different colors)
- - Private messaging i.e. namespaces
+ - Add ability to see other commandCenter messages without repeat
+ - Add ability to create other rooms/groups
