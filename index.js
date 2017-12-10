@@ -32,14 +32,14 @@ commandCenter.on('connection', function(socket){
         console.log('user disconnected from command');
     });
     socket.on('chat message', function(msg) {
-        var targetUserFlag = msg.toString().split(' '),
+        let targetUserFlag = msg.toString().split(' '),
             targetUserIndicator = targetUserFlag[0],
             pertinentMessage = msg.split(targetUserIndicator)[1];
 
         if (targetUserIndicator.startsWith('@')) {
             targetUserIndicator = targetUserIndicator.slice(1);
            try {
-             var targetSocket = clients[targetUserIndicator];
+             let targetSocket = clients[targetUserIndicator];
              if (targetSocket !== undefined) {
                  client.to(targetSocket).emit('chat message', pertinentMessage);
              } else {
