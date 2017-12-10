@@ -10,7 +10,7 @@
       form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
       ul {  width: 100%; }
       #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; display:list-item; margin: 7px; }
+      #messages li { padding: 5px 10px; display:list-item; margin: 5px; }
       .speech-bubble-me {
         position: relative;
         background: #00aabb;
@@ -32,9 +32,23 @@
   </head>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-  <script> 
+  <script>
+    var getRandomUsername = function() {
+      // IRL pull from session cookie
+      var text = "client#";
+      var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+      for (var i = 0; i < 10; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+      }
+      return text;
+    };
     $(function () {
-        var client = io('/client');
+        var client = io('/client', { 
+          query: {
+              username: getRandomUsername()
+          }
+        });
         $('form').submit(function(){
             client.emit('chat message', $('#m').val());
             $('#messages').append($('<li>').addClass('speech-bubble-me').text($('#m').val()));

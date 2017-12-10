@@ -1,9 +1,10 @@
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var client = io.of('/client');
-var commandCenter = io.of('/commandCenter');
-var clients = [];
+const app = require('express')(),
+    http = require('http').Server(app),
+    io = require('socket.io')(http),
+    client = io.of('/client'),
+    commandCenter = io.of('/commandCenter'),
+    clients = {};
+
 
 app.get('/client', function(req, res){
   res.sendFile(__dirname + '/client.html');
@@ -14,14 +15,14 @@ app.get('/commandCenter', function(req, res){
   });
 
 client.on('connection', function(socket) {
-    clients.push(socket.id);
     console.log('a user connected to client');
+    let username = socket.handshake.query.username;
+    clients[username.toString()] = socket.id;
     socket.on('disconnect', function(){
         console.log('user disconnected to client');
     });
     socket.on('chat message', function(msg){
-        commandCenter.emit('chat message', msg);
-        console.log("from client " + socket.id + ": " + msg);
+        commandCenter.emit('chat message', username + ": " + msg);
     });
 });
 
@@ -30,9 +31,27 @@ commandCenter.on('connection', function(socket){
     socket.on('disconnect', function(){
         console.log('user disconnected from command');
     });
-    socket.on('chat message', function(msg){
-        client.emit('chat message', msg);
-        console.log("from commandCenter" + socket.id + ": " + msg);
+    socket.on('chat message', function(msg) {
+        var targetUserFlag = msg.toString().split(' '),
+            targetUserIndicator = targetUserFlag[0],
+            pertinentMessage = msg.split(targetUserIndicator)[1];
+
+        if (targetUserIndicator.startsWith('@')) {
+            targetUserIndicator = targetUserIndicator.slice(1);
+           try {
+             var targetSocket = clients[targetUserIndicator];
+             if (targetSocket !== undefined) {
+                 client.to(targetSocket).emit('chat message', pertinentMessage);
+             } else {
+                 commandCenter.emit('chat message', "Please enter a valid target client. No punctuation allowed immediately target user.");
+             }
+           } catch(err) {
+                console.log(err);
+                commandCenter.emit('chat message', "Unable to send message. Please try again.");
+           }
+        } else {
+            commandCenter.emit('chat message', "Please indicate a target user for response.  Use @ sign and do not end with punctuation e.g. @user message");
+        }
     });
 });
 
